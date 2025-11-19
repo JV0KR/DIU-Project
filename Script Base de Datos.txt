@@ -1,0 +1,88 @@
+CREATE DATABASE IF NOT EXISTS documental;
+USE documental;
+
+-- ============================
+-- Tabla: categorias
+-- ============================
+CREATE TABLE categorias (
+  id_categoria INT(11) NOT NULL AUTO_INCREMENT,
+  nombre_categoria VARCHAR(100),
+  PRIMARY KEY (id_categoria)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO categorias (nombre_categoria) VALUES
+('Investigación'),
+('Administrativo'),
+('Finanzas'),
+('Académico'),
+('Recursos Humanos'),
+('Estudiantes'),
+('Infraestructura');
+
+-- ============================
+-- Tabla: perfiles
+-- ============================
+CREATE TABLE perfiles (
+  id_perfil INT(11) NOT NULL AUTO_INCREMENT,
+  perfil VARCHAR(30) NOT NULL,
+  PRIMARY KEY (id_perfil)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO perfiles (perfil) VALUES
+('Administrador'),
+('Usuario');
+
+-- ============================
+-- Tabla: datos (usuarios)
+-- ============================
+CREATE TABLE datos (
+  iddato INT(11) NOT NULL AUTO_INCREMENT,
+  identificacion VARCHAR(50) NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  usuario VARCHAR(50) NOT NULL,
+  clave VARCHAR(255) NOT NULL,
+  idperfil INT(11) NOT NULL,
+  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (iddato),
+  CONSTRAINT fk_perfil FOREIGN KEY (idperfil) REFERENCES perfiles(id_perfil) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO datos (identificacion, nombre, apellido, email, usuario, clave, idperfil) VALUES
+('1', 'test', 'test', 'test@test.org', 'test', 'test', 1),
+('2', 'test2', 'test2', 'test@test2.com', 'test2', 'test2', 2);
+
+-- ============================
+-- Tabla: documentos (ACTUALIZADA PARA GUARDAR BLOB)
+-- ============================
+CREATE TABLE documentos (
+  id_documento INT(11) NOT NULL AUTO_INCREMENT,
+  titulo VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  id_categoria INT(11) NOT NULL,
+  archivo LONGBLOB NOT NULL,
+  tipo_archivo VARCHAR(100),
+  id_usuario INT(11),
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_documento),
+  CONSTRAINT fk_doc_categoria FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+  CONSTRAINT fk_doc_usuario FOREIGN KEY (id_usuario) REFERENCES datos(iddato)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================
+-- Tabla: versiones (si las vas a usar luego)
+-- ============================
+CREATE TABLE versiones (
+  id_version INT(11) NOT NULL AUTO_INCREMENT,
+  id_documento INT(11),
+  version INT(11),
+  ruta_documento VARCHAR(255),
+  fecha_creacion DATETIME,
+  id_usuario INT(11),
+  PRIMARY KEY (id_version),
+  CONSTRAINT fk_ver_doc FOREIGN KEY (id_documento) REFERENCES documentos(id_documento),
+  CONSTRAINT fk_ver_user FOREIGN KEY (id_usuario) REFERENCES datos(iddato)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
