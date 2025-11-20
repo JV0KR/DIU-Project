@@ -29,9 +29,14 @@ public class LoginDAO {
 
         if (rs.next()) {
             datos = new Usuario();
+            datos.setIddato(rs.getInt("iddato"));
+            datos.setIdentificacion(rs.getString("identificacion"));
+            datos.setNombre(rs.getString("nombre"));
+            datos.setApellido(rs.getString("apellido"));
+            datos.setEmail(rs.getString("email"));
             datos.setUsuario(rs.getString("usuario"));
             datos.setClave(rs.getString("clave"));
-            datos.setIdperfil(rs.getInt("idperfil"));  // Verifica que este campo esté presente
+            datos.setIdperfil(rs.getInt("idperfil"));
         }
     } catch (SQLException e) {
         System.out.println("Error al verificar usuario: " + e.getMessage());
@@ -46,5 +51,4 @@ public class LoginDAO {
     }
     return datos;
 }
-
 }

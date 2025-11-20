@@ -86,3 +86,15 @@ CREATE TABLE versiones (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
+-- Agregar las columnas faltantes a la tabla documentos
+ALTER TABLE documentos 
+ADD COLUMN autor VARCHAR(100) AFTER descripcion,
+ADD COLUMN version VARCHAR(20) DEFAULT '1.0' AFTER autor,
+ADD COLUMN actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER creado_en;
+
+-- Actualizar los documentos existentes con valores por defecto
+UPDATE documentos SET autor = 'Sistema', version = '1.0' WHERE autor IS NULL;
+
+
+-- Añadir el Invitado
+INSERT INTO perfiles (perfil) VALUES ('Invitado');

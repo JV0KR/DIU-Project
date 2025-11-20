@@ -26,32 +26,27 @@ public class CtrolValidar extends HttpServlet {
 @Override
 protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-    // Obtener los parámetros correctamente
-    String usu = request.getParameter("cusuario");  // Debe coincidir con 'name="cusuario"' en el formulario
-    String cla = request.getParameter("cclave");    // Debe coincidir con 'name="cclave"' en el formulario
+    String usu = request.getParameter("cusuario");
+    String cla = request.getParameter("cclave");
 
-    // Verificar si los valores son correctos
     System.out.println("Usuario: " + usu);
     System.out.println("Contraseña: " + cla);
 
-    // Llamada a LoginDAO para validar los datos
-    Usuario datos = logindao.Login_datos(usu, cla); // Verifica que los datos se validen correctamente
+    Usuario datos = logindao.Login_datos(usu, cla);
 
     if (datos != null && datos.getUsuario() != null) {
-        // Si el usuario es válido, creamos la sesión
         HttpSession sesion_cli = request.getSession(true);
         sesion_cli.setAttribute("nUsuario", datos.getUsuario());
-        sesion_cli.setAttribute("perfilUsuario", datos.getIdperfil());
+        sesion_cli.setAttribute("idPerfil", datos.getIdperfil());
+        sesion_cli.setAttribute("idUsuario", datos.getIddato()); // ✅ AÑADIR ESTO
+        sesion_cli.setAttribute("nombreUsuario", datos.getNombre() + " " + datos.getApellido());
 
-        // Redirigir al panel de administración o a la página correspondiente
         response.sendRedirect("cpanel.jsp");
     } else {
-        // Si el usuario no es válido, redirigir al formulario de login
         request.setAttribute("error", "Usuario o contraseña incorrectos.");
         request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 }
-
 
     @Override
     public String getServletInfo() {

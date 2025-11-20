@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class Conexion {
 
     public static String usuario = "root";
-    public static String clave = "";
+    public static String clave = "admin1234";
     public static String servidor = "localhost:3306";
     public static String BD = "documental";
 

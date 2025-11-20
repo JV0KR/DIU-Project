@@ -1,4 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    String mensaje = request.getParameter("mensaje");
+    String error = request.getParameter("error");
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -6,55 +10,76 @@
         <title>Panel - Mensaje</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
+                font-family: 'Segoe UI', Arial, sans-serif;
                 margin: 0;
-                padding: 0;
-            }
-            header {
-                background-color: #007bff;
-                color: white;
-                padding: 15px;
-                text-align: center;
-                font-size: 24px;
-                font-weight: bold;
+                padding: 20px;
+                background: #f8f9fa;
             }
             .container {
-                width: 50%;
+                max-width: 600px;
                 margin: 100px auto;
-                background-color: #fff;
-                padding: 30px;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                overflow: hidden;
                 text-align: center;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                border-radius: 8px;
             }
-            h1 {
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+            }
+            .content {
+                padding: 40px;
+            }
+            .success {
                 color: #28a745;
-                font-size: 22px;
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            .error {
+                color: #dc3545;
+                font-size: 24px;
+                margin-bottom: 20px;
             }
             .btn-nav {
-                background-color: #007bff;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
-                padding: 10px 20px;
+                padding: 12px 30px;
                 border: none;
-                border-radius: 4px;
+                border-radius: 8px;
                 cursor: pointer;
-                font-size: 15px;
+                font-size: 16px;
+                font-weight: 600;
                 text-decoration: none;
                 display: inline-block;
-                margin-top: 20px;
+                margin: 10px;
+                transition: transform 0.2s;
             }
             .btn-nav:hover {
-                background-color: #0056b3;
+                transform: translateY(-2px);
+                color: white;
+                text-decoration: none;
             }
         </style>
     </head>
     <body>
-        <header>Formulario</header>
         <div class="container">
-            <h1>La información fue registrada con éxito</h1>
-            <a href="index.jsp" class="btn-nav">Registrar otro usuario</a>
-            <a href="ListaUsuarios.jsp" class="btn-nav">Ver lista de usuarios</a>
+            <div class="header">
+                <h1>📢 Sistema de Mensajes</h1>
+            </div>
+            <div class="content">
+                <% if (mensaje != null) { %>
+                    <div class="success">✅ <%= mensaje %></div>
+                <% } %>
+                <% if (error != null) { %>
+                    <div class="error">❌ <%= error %></div>
+                <% } %>
+                
+                <div style="margin-top: 30px;">
+                    <a href="front.jsp" class="btn-nav">🏠 Volver al panel</a>
+                </div>
+            </div>
         </div>
     </body>
 </html>

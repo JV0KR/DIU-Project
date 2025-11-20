@@ -3,43 +3,51 @@ package modelo;
 import Interfaces.CRUD;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UsuarioDAO implements CRUD {
 
     // INSERTAR
     @Override
     public int agregarUsuario(Usuario u) {
-        Conexion cn = new Conexion();
-        int estatus = 0;
+    Conexion cn = new Conexion();
+    int estatus = 0;
 
-        String q = "INSERT INTO datos (identificacion, nombre, apellido, email, usuario, clave, idperfil) VALUES (?,?,?,?,?,?,?)";
+    String q = "INSERT INTO datos (identificacion, nombre, apellido, email, usuario, clave, idperfil) VALUES (?,?,?,?,?,?,?)";
 
-        try (Connection con = cn.crearConexion();
-             PreparedStatement ps = (con != null) ? con.prepareStatement(q) : null) {
+    try (Connection con = cn.crearConexion();
+         PreparedStatement ps = (con != null) ? con.prepareStatement(q) : null) {
 
-            if (con == null || ps == null) {
-                System.out.println("No se pudo establecer conexión a la base de datos");
-                return 0;
-            }
-
-            ps.setString(1, u.getIdentificacion());
-            ps.setString(2, u.getNombre());
-            ps.setString(3, u.getApellido());
-            ps.setString(4, u.getEmail());
-            ps.setString(5, u.getUsuario());
-            ps.setString(6, u.getClave());
-            ps.setInt(7, u.getIdperfil());
-
-            estatus = ps.executeUpdate();
-
-            System.out.println("REGISTRO GUARDADO DE FORMA EXITOSA");
-        } catch (SQLException ex) {
-            System.out.println("ERROR AL REGISTRAR LA ACTIVIDAD");
-            ex.printStackTrace();
+        if (con == null || ps == null) {
+            System.out.println("❌ No se pudo establecer conexión a la base de datos");
+            return 0;
         }
-        return estatus;
+
+        ps.setString(1, u.getIdentificacion());
+        ps.setString(2, u.getNombre());
+        ps.setString(3, u.getApellido());
+        ps.setString(4, u.getEmail());
+        ps.setString(5, u.getUsuario());
+        ps.setString(6, u.getClave());
+        ps.setInt(7, u.getIdperfil());
+
+        System.out.println("🚀 Ejecutando INSERT en tabla datos...");
+        estatus = ps.executeUpdate();
+
+        if (estatus > 0) {
+            System.out.println("✅ REGISTRO GUARDADO EXITOSAMENTE - Usuario: " + u.getUsuario());
+        } else {
+            System.out.println("❌ NO SE PUDO GUARDAR EL REGISTRO");
+        }
+        
+    } catch (SQLException ex) {
+        System.out.println("❌ ERROR AL REGISTRAR USUARIO: " + ex.getMessage());
+        ex.printStackTrace();
     }
+    return estatus;
+}
 
     // ACTUALIZAR
     @Override
@@ -149,4 +157,54 @@ public class UsuarioDAO implements CRUD {
         }
         return lista;
     }
+    
+     public Map<String, Integer> obtenerUsuariosPorMes() {
+        Map<String, Integer> usuariosPorMes = new HashMap<>();
+        Conexion cn = new Conexion();
+        
+        String sql = "SELECT MONTHNAME(creado_en) as mes, COUNT(*) as cantidad " +
+                    "FROM datos " +
+                    "WHERE YEAR(creado_en) = YEAR(CURDATE()) " +
+                    "GROUP BY MONTH(creado_en), MONTHNAME(creado_en) " +
+                    "ORDER BY MONTH(creado_en)";
+        
+        try (Connection con = cn.crearConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                String mes = rs.getString("mes");
+                int cantidad = rs.getInt("cantidad");
+                usuariosPorMes.put(mes, cantidad);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("Error al obtener usuarios por mes: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return usuariosPorMes;
+    }
+
+    // NUEVO MÉTODO: Obtener total de usuarios activos
+    public int obtenerTotalUsuariosActivos() {
+        int total = 0;
+        Conexion cn = new Conexion();
+        
+        String sql = "SELECT COUNT(*) as total FROM datos";
+        
+        try (Connection con = cn.crearConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println("Error al obtener total de usuarios: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return total;
+    }
 }
+

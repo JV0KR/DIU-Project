@@ -4,6 +4,7 @@ import modelo.Documento;
 import modelo.DocumentoDAO;
 import modelo.CategoriaDAO;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,9 +48,20 @@ public class ControladorDocumento extends HttpServlet {
                 descargarDocumento(request, response);
                 break;
 
+            case "misDocumentos":
+                verMisDocumentos(request, response);
+                break;
+            case "eliminar":
+                eliminarDocumento(request, response);
+                break;
+            case "editar":
+                cargarEdicionDocumento(request, response);
+                break;
             default:
                 response.sendRedirect("index.jsp");
                 break;
+            
+                
         }
     }
 
@@ -68,46 +80,88 @@ public class ControladorDocumento extends HttpServlet {
             case "insertar":
                 insertarDocumento(request, response);
                 break;
+            case "actualizar":
+                actualizarDocumento(request, response);
+                break;
             default:
                 response.getWriter().println("Acción no reconocida");
                 break;
         }
     }
 
-    private void insertarDocumento(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+   private void insertarDocumento(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        try {
-            String titulo = request.getParameter("titulo");
-            String descripcion = request.getParameter("descripcion");
-            int idCategoria = Integer.parseInt(request.getParameter("id_categoria"));
+    try {
+        HttpSession session = request.getSession();
+        String usuario = (String) session.getAttribute("nUsuario");
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario"); // ✅ OBTENER ID
 
-            Part filePart = request.getPart("archivo");
-            InputStream archivoStream = filePart.getInputStream();
-            String tipoArchivo = filePart.getContentType();
+        String titulo = request.getParameter("titulo");
+        String descripcion = request.getParameter("descripcion");
+        int idCategoria = Integer.parseInt(request.getParameter("id_categoria"));
+        String autor = request.getParameter("autor");
+        String version = request.getParameter("version");
 
-            Documento d = new Documento();
-            d.setTitulo(titulo);
-            d.setDescripcion(descripcion);
-            d.setIdCategoria(idCategoria);
-            d.setArchivo(archivoStream);
-            d.setTipoArchivo(tipoArchivo);
+        Part filePart = request.getPart("archivo");
+        InputStream archivoStream = filePart.getInputStream();
+        String tipoArchivo = filePart.getContentType();
 
-            int saved = dao.insertar(d);
+        Documento d = new Documento();
+        d.setTitulo(titulo);
+        d.setDescripcion(descripcion);
+        d.setIdCategoria(idCategoria);
+        d.setArchivo(archivoStream);
+        d.setTipoArchivo(tipoArchivo);
+        d.setAutor(autor != null ? autor : usuario);
+        d.setVersion(version != null ? version : "1.0");
+        d.setIdUsuario(idUsuario != null ? idUsuario : 1); // ✅ ESTABLECER ID
 
-            if (saved == 1) {
-                response.sendRedirect("message.jsp?msg=Documento guardado con éxito");
-            } else {
-                response.sendRedirect("message.jsp?msg=Error al guardar documento");
-            }
+        int saved = dao.insertar(d);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.getWriter().println("Error subiendo archivo: " + e.getMessage());
+        if (saved == 1) {
+            response.sendRedirect("message.jsp?msg=Documento guardado con éxito");
+        } else {
+            response.sendRedirect("message.jsp?msg=Error al guardar documento");
         }
-    }
 
-    // Metodo para realizar búsqueda
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.getWriter().println("Error subiendo archivo: " + e.getMessage());
+    }
+}
+
+   private void actualizarDocumento(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int idDocumento = Integer.parseInt(request.getParameter("id_documento"));
+        String titulo = request.getParameter("titulo");
+        String descripcion = request.getParameter("descripcion");
+        int idCategoria = Integer.parseInt(request.getParameter("id_categoria"));
+        String version = request.getParameter("version");
+        String autor = request.getParameter("autor"); // ✅ AGREGAR ESTO
+
+        Documento d = new Documento();
+        d.setIdDocumento(idDocumento);
+        d.setTitulo(titulo);
+        d.setDescripcion(descripcion);
+        d.setIdCategoria(idCategoria);
+        d.setVersion(version);
+        d.setAutor(autor); // ✅ AGREGAR ESTO
+
+        int updated = dao.actualizar(d);
+
+        if (updated == 1) {
+            response.sendRedirect("ControladorDocumento?action=misDocumentos&msg=Documento actualizado con éxito");
+        } else {
+            response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error al actualizar documento");
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error en actualización: " + e.getMessage());
+    }
+}
     private void realizarBusqueda(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -124,11 +178,17 @@ public class ControladorDocumento extends HttpServlet {
                 idCategoria = 0;
             }
 
-            System.out.println("Iniciando búsqueda:");
+            String autor = request.getParameter("autor");
+            if (autor == null) {
+                autor = "";
+            }
+
+            System.out.println("Búsqueda avanzada:");
             System.out.println(" - Título: '" + titulo + "'");
             System.out.println(" - Categoría ID: " + idCategoria);
+            System.out.println(" - Autor: '" + autor + "'");
 
-            List<Documento> resultados = dao.buscar(titulo, idCategoria);
+            List<Documento> resultados = dao.buscarAvanzado(titulo, idCategoria, autor);
 
             System.out.println("Resultados obtenidos: " + resultados.size() + " documentos");
 
@@ -144,7 +204,6 @@ public class ControladorDocumento extends HttpServlet {
         }
     }
 
-    // Metodo para descargar documentos
     private void descargarDocumento(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -153,7 +212,6 @@ public class ControladorDocumento extends HttpServlet {
             Documento documento = dao.obtenerArchivo(idDocumento);
 
             if (documento.getArchivo() != null) {
-                // Obtener la extensión del archivo
                 String extension = obtenerExtension(documento.getTipoArchivo(), documento.getTitulo());
                 String nombreArchivo = documento.getTitulo() + extension;
 
@@ -189,7 +247,23 @@ public class ControladorDocumento extends HttpServlet {
         }
     }
 
-// Metodo para obtener extensión del archivo
+
+    private void verMisDocumentos(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            String usuario = (String) session.getAttribute("nUsuario");
+            
+            List<Documento> misDocumentos = dao.obtenerPorAutor(usuario);
+            request.setAttribute("misDocumentos", misDocumentos);
+            request.getRequestDispatcher("MisDocumentos.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("message.jsp?msg=Error al cargar documentos");
+        }
+    }
+
     private String obtenerExtension(String tipoArchivo, String titulo) {
         switch (tipoArchivo) {
             case "application/pdf":
@@ -221,4 +295,49 @@ public class ControladorDocumento extends HttpServlet {
                 return ""; 
         }
     }
+    
+    private void eliminarDocumento(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int idDocumento = Integer.parseInt(request.getParameter("id"));
+        int resultado = dao.eliminar(idDocumento);
+        
+        if (resultado > 0) {
+            response.sendRedirect("ControladorDocumento?action=misDocumentos&msg=Documento eliminado correctamente");
+        } else {
+            response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error al eliminar el documento");
+        }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error en la eliminación");
+    }
+}
+
+private void cargarEdicionDocumento(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int idDocumento = Integer.parseInt(request.getParameter("id"));
+        System.out.println("Cargando edición para documento ID: " + idDocumento);
+        
+        Documento documento = dao.obtenerParaEdicion(idDocumento);
+        
+        if (documento.getIdDocumento() == 0) {
+            System.out.println("Documento no encontrado en la base de datos");
+            response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Documento no encontrado");
+            return;
+        }
+        
+        System.out.println("Documento encontrado: " + documento.getTitulo());
+        
+        request.setAttribute("documento", documento);
+        request.setAttribute("categorias", new CategoriaDAO().listar());
+        request.getRequestDispatcher("EditarDocumento.jsp").forward(request, response);
+        
+    } catch (Exception e) {
+        System.out.println("Error al cargar edición: " + e.getMessage());
+        e.printStackTrace();
+        response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error al cargar edición: " + e.getMessage());
+    }
+}
 }

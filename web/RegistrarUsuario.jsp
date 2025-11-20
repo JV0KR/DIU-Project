@@ -6,112 +6,171 @@
         <title>Panel - Registrar Usuario</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
+                font-family: 'Segoe UI', Arial, sans-serif;
                 margin: 0;
-                padding: 0;
+                padding: 20px;
+                background: #f8f9fa;
             }
             .container {
-                width: 50%;
+                max-width: 800px;
                 margin: 40px auto;
-                background-color: #fff;
-                padding: 25px 40px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                border-radius: 8px;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                overflow: hidden;
             }
-
-            form {
-                display: grid;
-                grid-template-columns: 150px 1fr;
-                gap: 12px 15px;
-                align-items: center;
-            }
-
-            form label {
-                text-align: right;
-                font-weight: bold;
-            }
-
-            form input, form select {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-
-            input[type="submit"] {
-                grid-column: 1 / span 2;
-                background-color: #007bff;
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
-                padding: 12px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 10px;
+                padding: 30px;
+                text-align: center;
             }
-
-            input[type="submit"]:hover {
-                background-color: #0056b3;
+            .form-section {
+                padding: 30px;
             }
-
-            .nav-link {
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            .form-group {
                 margin-bottom: 20px;
             }
-
-            .btn-nav {
-                background-color: #007bff;
-                color: white;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 15px;
+            label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: #495057;
             }
-
-            .btn-nav:hover {
-                background-color: #0056b3;
+            input[type="text"], input[type="password"], input[type="email"], select {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+                box-sizing: border-box;
+            }
+            input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+            .btn-submit {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                border: none;
+                padding: 15px 40px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: transform 0.2s;
+                width: 100%;
+                margin-top: 10px;
+            }
+            .btn-submit:hover {
+                transform: translateY(-2px);
+            }
+            .btn-back {
+                background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+                color: white;
+                padding: 12px 30px;
+                border-radius: 8px;
+                text-decoration: none;
+                display: inline-block;
+                font-weight: 600;
+                transition: transform 0.2s;
+                margin-bottom: 20px;
+            }
+            .btn-back:hover {
+                transform: translateY(-2px);
+                color: white;
+                text-decoration: none;
+            }
+            .required::after {
+                content: " *";
+                color: #dc3545;
+            }
+            .help-text {
+                font-size: 12px;
+                color: #6c757d;
+                margin-top: 5px;
+            }
+            .full-width {
+                grid-column: 1 / span 2;
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="nav-link">
-                <form action="ListaUsuarios.jsp" method="get">
-                    <button class="btn-nav" type="submit">Regresar</button>
-                </form>
-
+            <div class="header">
+                <h1>👤 Registrar Nuevo Usuario</h1>
+                <p>Agregar un nuevo usuario al sistema de gestión documental</p>
             </div>
 
-            <h2>Registrar Usuario</h2>
-            <form id="form1" name="form1" method="post" action="controladorUsuario">
-                <label for="cidentificacion">Identificación:</label>
-                <input type="text" id="cidentificacion" name="cidentificacion" required>
+            <div class="form-section">
 
-                <label for="cnombre">Nombre:</label>
-                <input type="text" id="cnombre" name="cnombre" required>
+                <form id="form1" name="form1" method="post" action="ControladorUsuario">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cidentificacion" class="required">🆔 Identificación</label>
+                            <input type="text" id="cidentificacion" name="cidentificacion" required
+                                   placeholder="Número de identificación">
+                        </div>
 
-                <label for="capellido">Apellido:</label>
-                <input type="text" id="capellido" name="capellido" required>
+                        <div class="form-group">
+                            <label for="cnombre" class="required">👤 Nombres</label>
+                            <input type="text" id="cnombre" name="cnombre" required
+                                   placeholder="Nombres del usuario">
+                        </div>
 
-                <label for="cmail">Email:</label>
-                <input type="email" id="cmail" name="cmail" required>
+                        <div class="form-group">
+                            <label for="capellido" class="required">👥 Apellidos</label>
+                            <input type="text" id="capellido" name="capellido" required
+                                   placeholder="Apellidos del usuario">
+                        </div>
 
-                <label for="cusuario">Usuario:</label>
-                <input type="text" id="cusuario" name="cusuario" required>
+                        <div class="form-group">
+                            <label for="cmail" class="required">📧 Email</label>
+                            <input type="email" id="cmail" name="cmail" required
+                                   placeholder="correo@ejemplo.com">
+                        </div>
 
-                <label for="cclave">Clave:</label>
-                <input type="password" id="cclave" name="cclave" required>
+                        <div class="form-group">
+                            <label for="cusuario" class="required">🔐 Usuario</label>
+                            <input type="text" id="cusuario" name="cusuario" required
+                                   placeholder="Nombre de usuario">
+                        </div>
 
-                <label for="cidperfil">Perfil:</label>
-                <select id="cidperfil" name="cidperfil" required>
-                    <option value="1">Administrador</option>
-                    <option value="2">Usuario</option>
-                </select>
+                        <div class="form-group">
+                            <label for="cclave" class="required">🔒 Contraseña</label>
+                            <input type="password" id="cclave" name="cclave" required
+                                   placeholder="Contraseña segura">
+                        </div>
 
-                <input type="submit" value="Registrar Usuario">
-            </form>
+                        <div class="form-group full-width">
+                            <label for="cidperfil" class="required">🎭 Perfil</label>
+                            <select id="cidperfil" name="cidperfil" required>
+                                <option value="">Seleccione un perfil</option>
+                                <option value="1">👑 Administrador</option>
+                                <option value="2">👤 Usuario Académico</option>
+                                <option value="3">👀 Invitado</option>
+                            </select>
+                            <div class="help-text">
+                                • Administrador: Acceso completo al sistema<br>
+                                • Usuario Académico: Puede subir y gestionar documentos<br>
+                                • Invitado: Solo consulta de documentos
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        ➕ Registrar Usuario
+                    </button>
+                    
+                    
+                </form>
+            </div>
         </div>
     </body>
 </html>
