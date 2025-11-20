@@ -255,20 +255,27 @@
             
             <!-- Gestión de Usuarios (Solo Admin) -->
             <% if (idPerfil != null && idPerfil == 1) { %>
-            <div class="menu-section">👥 Administración</div>
-            
-            <div class="menu-item">
-                <a href="RegistrarUsuario.jsp" target="marcoDatos">
-                    👤 Registrar Usuario
-                </a>
+                        <div class="menu-section">👥 Administración</div>
+
+                    <div class="menu-item">
+                                  <a href="RegistrarUsuario.jsp" target="marcoDatos">
+                                                👤 Registrar Usuario
+                                    </a>
+                                </div>
+
+                                <div class="menu-item">
+                                 <a href="ListaUsuarios.jsp" target="marcoDatos">
+                                         📋 Listar Usuarios
+                                    </a>
+                                        </div>
+
+<!-- NUEVO: Administración de Documentos -->
+                    <div class="menu-item">
+                     <a href="ControladorDocumento?action=adminDocumentos" target="marcoDatos">
+        🗂️ Gestionar Documentos
+             </a>
             </div>
-            
-            <div class="menu-item">
-                <a href="ListaUsuarios.jsp" target="marcoDatos">
-                    📋 Listar Usuarios
-                </a>
-            </div>
-            <% } %>
+                <% } %>
             
             <!-- Reportes y Estadísticas (Solo Admin) -->
             <% if (idPerfil != null && idPerfil == 1) { %>

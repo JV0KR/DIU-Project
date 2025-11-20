@@ -47,7 +47,15 @@ public class ControladorDocumento extends HttpServlet {
             case "descargar":  
                 descargarDocumento(request, response);
                 break;
-
+            case "adminDocumentos":
+                 verAdminDocumentos(request, response);
+                 break;
+            case "adminBuscar":
+                 adminBuscarDocumentos(request, response);
+                 break;
+            case "adminEliminar":
+                 adminEliminarDocumento(request, response);
+                 break;
             case "misDocumentos":
                 verMisDocumentos(request, response);
                 break;
@@ -338,6 +346,94 @@ private void cargarEdicionDocumento(HttpServletRequest request, HttpServletRespo
         System.out.println("Error al cargar edición: " + e.getMessage());
         e.printStackTrace();
         response.sendRedirect("ControladorDocumento?action=misDocumentos&error=Error al cargar edición: " + e.getMessage());
+    }
+}
+
+private void verAdminDocumentos(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        // Verificar que sea administrador
+        HttpSession session = request.getSession();
+        Integer idPerfil = (Integer) session.getAttribute("idPerfil");
+        
+        if (idPerfil == null || idPerfil != 1) {
+            response.sendRedirect("noPermission.jsp");
+            return;
+        }
+        
+        // Obtener todos los documentos
+        List<Documento> documentos = dao.buscar("", 0);
+        request.setAttribute("documentos", documentos);
+        request.setAttribute("categorias", new CategoriaDAO().listar());
+        request.getRequestDispatcher("AdminDocumentos.jsp").forward(request, response);
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("message.jsp?msg=Error al cargar administración de documentos");
+    }
+}
+
+private void adminBuscarDocumentos(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        // Verificar que sea administrador
+        HttpSession session = request.getSession();
+        Integer idPerfil = (Integer) session.getAttribute("idPerfil");
+        
+        if (idPerfil == null || idPerfil != 1) {
+            response.sendRedirect("noPermission.jsp");
+            return;
+        }
+
+        String titulo = request.getParameter("titulo");
+        if (titulo == null) titulo = "";
+
+        int idCategoria = 0;
+        try {
+            idCategoria = Integer.parseInt(request.getParameter("id_categoria"));
+        } catch (NumberFormatException e) {
+            idCategoria = 0;
+        }
+
+        String autor = request.getParameter("autor");
+        if (autor == null) autor = "";
+
+        List<Documento> resultados = dao.buscarAvanzado(titulo, idCategoria, autor);
+        
+        request.setAttribute("documentos", resultados);
+        request.setAttribute("categorias", new CategoriaDAO().listar());
+        request.getRequestDispatcher("AdminDocumentos.jsp").forward(request, response);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("AdminDocumentos.jsp?error=Error en la búsqueda");
+    }
+}
+
+private void adminEliminarDocumento(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        // Verificar que sea administrador
+        HttpSession session = request.getSession();
+        Integer idPerfil = (Integer) session.getAttribute("idPerfil");
+        
+        if (idPerfil == null || idPerfil != 1) {
+            response.sendRedirect("noPermission.jsp");
+            return;
+        }
+
+        int idDocumento = Integer.parseInt(request.getParameter("id"));
+        int resultado = dao.eliminar(idDocumento);
+        
+        if (resultado > 0) {
+            response.sendRedirect("ControladorDocumento?action=adminDocumentos&msg=Documento eliminado correctamente");
+        } else {
+            response.sendRedirect("ControladorDocumento?action=adminDocumentos&error=Error al eliminar el documento");
+        }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendRedirect("ControladorDocumento?action=adminDocumentos&error=Error en la eliminación: " + e.getMessage());
     }
 }
 }
