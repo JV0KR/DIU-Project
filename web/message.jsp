@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
-    String mensaje = request.getParameter("mensaje");
+    String msg = request.getParameter("msg");
     String error = request.getParameter("error");
 %>
 <!DOCTYPE html>
@@ -61,6 +61,11 @@
                 color: white;
                 text-decoration: none;
             }
+            .info {
+                color: #17a2b8;
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
         </style>
     </head>
     <body>
@@ -69,15 +74,21 @@
                 <h1>📢 Sistema de Mensajes</h1>
             </div>
             <div class="content">
-                <% if (mensaje != null) { %>
-                    <div class="success">✅ <%= mensaje %></div>
+                <% if (msg != null) { %>
+                    <div class="success">✅ <%= msg %></div>
                 <% } %>
                 <% if (error != null) { %>
                     <div class="error">❌ <%= error %></div>
                 <% } %>
                 
+                <%-- Si no hay mensajes, mostrar uno por defecto --%>
+                <% if (msg == null && error == null) { %>
+                    <div class="info">ℹ️ No hay mensajes para mostrar</div>
+                <% } %>
+                
                 <div style="margin-top: 30px;">
                     <a href="front.jsp" class="btn-nav">🏠 Volver al panel</a>
+                    <a href="javascript:history.back()" class="btn-nav">↩️ Volver atrás</a>
                 </div>
             </div>
         </div>
