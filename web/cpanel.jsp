@@ -37,11 +37,12 @@
         }
         .user-info { 
             background: white; 
-            padding: 20px; 
-            margin: 0 30px 20px 30px; 
-            border-radius: 10px; 
+            padding: 25px; 
+            margin: 0 0px 0px 0px; 
+            border-radius: 0px; 
+            border-bottom: 1px solid #dee2e6;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-left: 4px solid #667eea;
+            
         }
         .dashboard-container {
             display: flex;
@@ -177,7 +178,7 @@
             <div style="font-size: 14px; opacity: 0.9;">Plataforma de gestión de documentos departamentales</div>
         </div>
         <div style="text-align: right;">
-            <div style="margin-bottom: 5px;">Bienvenido: <strong><%= nombreCompleto != null ? nombreCompleto : nUsuario %></strong></div>
+           
             <div>
                 <span class="profile-badge">
                     🎭 
