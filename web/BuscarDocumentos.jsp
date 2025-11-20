@@ -9,7 +9,7 @@
     CategoriaDAO catDao = new CategoriaDAO();
     List<Categoria> categorias = catDao.listar();
     
-    System.out.println("Categorías cargadas: " + (categorias != null ? categorias.size() : "null"));
+    getServletContext().log("Categorías cargadas: " + (categorias != null ? categorias.size() : "null"));
 %>
 
 <!DOCTYPE html>
