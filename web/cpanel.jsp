@@ -178,7 +178,7 @@
             <div style="font-size: 14px; opacity: 0.9;">Plataforma de gestión de documentos departamentales</div>
         </div>
         <div style="text-align: right;">
-           
+           <div style="margin-bottom: 20px;">Bienvenido: <strong><%= nombreCompleto != null ? nombreCompleto : nUsuario %></strong></div>
             <div>
                 <span class="profile-badge">
                     🎭 
@@ -202,8 +202,6 @@
     <div class="user-info">
         <div class="welcome-user">👋 ¡Hola, <%= nombreCompleto != null ? nombreCompleto.split(" ")[0] : nUsuario %>! Bienvenido a la plataforma</div>
         <div>
-            <strong>Usuario:</strong> <%= nUsuario %> | 
-            <strong>Perfil ID:</strong> <%= idPerfil != null ? idPerfil : "No asignado" %> |
             <strong>Privilegios:</strong> 
             <%
                 if (idPerfil != null) {
