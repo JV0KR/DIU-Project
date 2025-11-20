@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="modelo.Categoria" %>
@@ -84,18 +85,30 @@
         .file-upload {
             border: 2px dashed #dee2e6;
             border-radius: 8px;
-            padding: 20px;
+            padding: 40px 20px;
             text-align: center;
             background: #f8f9fa;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
         }
         .file-upload:hover {
             border-color: #667eea;
+            background: #f0f4ff;
         }
         .file-upload input[type="file"] {
-            margin: 10px 0;
-            width: 100%;
+            margin: 20px 0;
+            width: auto;
+            max-width: 300px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
         }
         .btn-submit {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -125,13 +138,17 @@
             font-size: 12px;
             color: #6c757d;
             margin-top: 5px;
+            text-align: center;
         }
         .file-info {
             margin-top: 10px;
-            padding: 10px;
+            padding: 15px;
             background: #e9ecef;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
         }
         .file-selected {
             border-color: #28a745 !important;
@@ -141,6 +158,39 @@
             color: #28a745;
             font-weight: 600;
             margin: 10px 0;
+            text-align: center;
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        .file-input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .custom-file-input {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .custom-file-input:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .file-name {
+            font-weight: 600;
+            color: #495057;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -202,10 +252,22 @@
                 <div class="form-group">
                     <label class="required">📎 Archivo</label>
                     <div class="file-upload" id="fileUploadArea">
+                        <div class="upload-icon">📁</div>
                         <div id="uploadMessage">
-                            <p>🔼 Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+                            <p style="font-weight: 600; margin-bottom: 10px;">Selecciona un archivo para subir</p>
+                            <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">
+                                Arrastra y suelta tu archivo aquí o haz clic para seleccionar
+                            </p>
                         </div>
-                        <input type="file" name="archivo" id="archivoInput" required accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+                        <div class="file-input-container">
+                            <label for="archivoInput" class="custom-file-input">
+                                📂 Seleccionar Archivo
+                            </label>
+                            <input type="file" name="archivo" id="archivoInput" required 
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" 
+                                   style="display: none;">
+                            <div id="selectedFileName" class="file-name"></div>
+                        </div>
                         <div class="help-text">
                             Formatos permitidos: PDF, Word, Excel, PowerPoint, TXT (Máx. 50MB)
                         </div>
@@ -232,6 +294,7 @@
             const fileName = document.getElementById('fileName');
             const fileSize = document.getElementById('fileSize');
             const uploadMessage = document.getElementById('uploadMessage');
+            const selectedFileName = document.getElementById('selectedFileName');
             
             // Función para actualizar la interfaz cuando se selecciona un archivo
             function updateFileInfo(file) {
@@ -239,24 +302,16 @@
                     fileName.textContent = file.name;
                     fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
                     fileInfo.style.display = 'block';
+                    selectedFileName.textContent = file.name;
                     
                     fileUploadArea.classList.add('file-selected');
                     
-                    // Crear el mensaje usando métodos DOM en lugar de template literals
-                    uploadMessage.innerHTML = '';
-                    
-                    const message1 = document.createElement('p');
-                    message1.className = 'file-selected-message';
-                    message1.innerHTML = '✅ Archivo seleccionado: <strong>' + file.name + '</strong>';
-                    uploadMessage.appendChild(message1);
-                    
-                    const message2 = document.createElement('p');
-                    message2.textContent = 'Tamaño: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB';
-                    uploadMessage.appendChild(message2);
-                    
-                    const message3 = document.createElement('p');
-                    message3.textContent = 'Haz clic para cambiar el archivo';
-                    uploadMessage.appendChild(message3);
+                    // Actualizar el mensaje
+                    uploadMessage.innerHTML = `
+                        <div class="file-selected-message">
+                            <p>✅ Archivo seleccionado correctamente</p>
+                        </div>
+                    `;
                 }
             }
             
@@ -272,18 +327,22 @@
                 e.preventDefault();
                 this.style.borderColor = '#667eea';
                 this.style.background = '#f0f4ff';
+                this.style.transform = 'scale(1.02)';
             });
 
             fileUploadArea.addEventListener('dragleave', function(e) {
                 e.preventDefault();
-                if (!this.classList.contains('file-selected')) {
-                    this.style.borderColor = '#dee2e6';
-                    this.style.background = '#f8f9fa';
-                }
+                this.style.borderColor = '#dee2e6';
+                this.style.background = '#f8f9fa';
+                this.style.transform = 'scale(1)';
             });
 
             fileUploadArea.addEventListener('drop', function(e) {
                 e.preventDefault();
+                this.style.borderColor = '#dee2e6';
+                this.style.background = '#f8f9fa';
+                this.style.transform = 'scale(1)';
+                
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     fileInput.files = files;
@@ -358,11 +417,6 @@
                     e.preventDefault();
                     return;
                 }
-            });
-
-            // Prevenir que el formulario se envíe si hay campos inválidos
-            document.getElementById('documentForm').addEventListener('formdata', function(e) {
-                console.log('Formulario enviado con datos:', e.formData);
             });
         });
     </script>
